@@ -4,7 +4,6 @@ class Client_DB:
     def __init__(self):
         self.__database = self.__load()
 
-
     def __load(self):
         if os.path.exists(config["DB"]["client"]): # path.exists- проверят существует ли указанный файл в папке True - если файл есть \ False если он отсутсвует
             with open(config["DB"]["client"], mode = "r", encoding="utf-8") as fl:
@@ -26,7 +25,9 @@ class Client_DB:
 
 
     def add(self, id: str, message: str):
+
         if str(id) not in list(self.__database.keys()):
+
             """Добавление нового пользователя
 
             Args:
@@ -58,17 +59,40 @@ class Client_DB:
         self.__update()
 
 
-# class Supports_DB:
-#     def __init__(self):
-#         self.__database = self.__load()
+class Supports_DB:
+    def __init__(self):
+        self.__database = self.__load()
 
-#     def __load(self):
-#         if os.path.exists(config["DB"]["support"]):
-#             with open(config["DB"]["support"], mode = "r", encoding="utf-8") as fl:
-#                 data = json.load(fl)
-#             return(data)
-#         else:
-#             data = {}
-#             with open(config["DB"]["support"], mode = "w", encoding="utf-8") as fl:
-#                 json.dump(data, fl, ensure_ascii=False)
-#             return(data)
+    def __load(self):
+        if os.path.exists(config["DB"]["support"]):
+            with open(config["DB"]["support"], mode = "r", encoding="utf-8") as fl:
+                data = json.load(fl)
+            return(data)
+        else:
+            data = {}
+            with open(config["DB"]["support"], mode = "w", encoding="utf-8") as fl:
+                json.dump(data, fl, ensure_ascii=False)
+            return(data)
+
+
+    def __update(self):
+        """
+        Обновление базы данных в папке data
+        """
+        with open(config["DB"]["support"], mode = "w", encoding="utf-8") as fl:
+            json.dump(self.__database, fl, ensure_ascii=False)
+
+
+    def buzy(self, buzy: str, id: str):
+        """Смена "занятости"
+
+        Args:
+            buzy (bool): True or False
+            id (str): "921040105"
+        """
+        self.__database["telegram_id"] = {
+            "buzy": buzy,
+            "client_id": id
+        }
+        self.__update()
+
