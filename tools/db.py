@@ -74,7 +74,6 @@ class Supports_DB:
                 json.dump(data, fl, ensure_ascii=False)
             return(data)
 
-
     def __update(self):
         """
         Обновление базы данных в папке data

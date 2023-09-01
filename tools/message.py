@@ -13,6 +13,9 @@ with open(config['DB']['support'], mode = "r", encoding="utf-8") as fl:
     sup_id_mas = json.load(fl)
 
 sup_id = sup_id_mas["telegram_id"]["client_id"]
+client_id = ""
+msg_id_client = []
+msg_id_support = []
 
 @dp.message_handler(commands='start')
 async def start(message: types.Message):
@@ -20,16 +23,12 @@ async def start(message: types.Message):
     with open(config['DB']['support'], mode = "r", encoding="utf-8") as fl:
         sup_id_mas = json.load(fl)
 
-    print(sup_id_mas["telegram_id"]["buzy"])
-
     if sup_id_mas["telegram_id"]["buzy"] == "false":
 
         await bot.send_message(message.chat.id,
                     "⚠️Сразу пишите свойю 👉ПОЧТУ (с которой была покупка)\n"
                     "👉ЛОГИН аккаунта с которым проблема⚠️\n"
                     "И сразу ваш вопрос, если не напишете, то вам и не ответят❗️")
-
-        await Form.catcher.set()
 
         start_chating = types.InlineKeyboardMarkup()
         start_sup = types.InlineKeyboardButton(text="Начать сеанс", callback_data="Start." + str(message.chat.id))
@@ -44,16 +43,9 @@ async def start(message: types.Message):
         pass
 
 
-@dp.message_handler(state=Form.catcher)
-async def db_add(message: types.Message, state: FSMContext):
-    client_db = Client_DB()
-    client_id = message.chat.id
-    client_txt = message.text
-    client_db.add(client_id, client_txt)
-
-
 @dp.callback_query_handler(text_contains='Start.')
 async def ans(call):
+    global client_id, msg_id_client, msg_id_support
     client_id = (call.data.split('.')[1])
     await bot.send_message(client_id, "Поддержка на связи")
 
@@ -74,13 +66,48 @@ async def ans(call):
                         ,reply_markup=over)
 
     for i in range(len(quest[client_id]["message"])):
-        await bot.send_message(sup_id, quest[client_id]["message"][i])
+        msg = await bot.send_message(sup_id, quest[client_id]["message"][i])
+        msg_id_client.append(msg.message_id)
 
-    # await Form.next()
+
+@dp.message_handler(content_types='text')
+async def db_add(message: types.Message):
+    global client_id, msg_id_client, msg_id_support
+
+    with open(config['DB']['support'], mode = "r", encoding="utf-8") as fl:
+        sup_id_mas = json.load(fl)
+
+    with open(config['DB']['client'], mode = "r", encoding="utf-8") as fl:
+        quest = json.load(fl)
+
+    if sup_id_mas["telegram_id"]["buzy"] == "true" and str(message.chat.id) != sup_id:
+
+        msg = await bot.send_message(sup_id, message.text)
+        msg_id_client.append(msg.message_id)
+
+        client_db = Client_DB()
+        client_id = message.chat.id
+        client_txt = message.text
+        client_db.add(client_id, client_txt)
+
+    elif str(message.chat.id) == sup_id:
+
+        msg = await bot.send_message(client_id, message.text)
+        msg_id_support.append(msg.message_id)
+        print(msg)
+        print(msg["from"].id)
+
+    else:
+
+        client_db = Client_DB()
+        client_id = message.chat.id
+        client_txt = message.text
+        client_db.add(client_id, client_txt)
 
 
 @dp.callback_query_handler(text_contains='end.')
 async def ans(call):
+    global client_id, msg_id_client, msg_id_support
     client_id = (call.data.split('.')[1])
 
     support_db = Supports_DB()
@@ -88,11 +115,19 @@ async def ans(call):
 
     await bot.delete_message(chat_id=call.from_user.id, message_id=call.message.message_id)
 
+    print(msg_id_client, msg_id_support)
+
+    for i in range(len(msg_id_client)):
+        await bot.delete_message(chat_id=sup_id, message_id=msg_id_client[i])
+
+    for i in range(len(msg_id_support)):
+        await bot.delete_message(chat_id=sup_id, message_id=msg_id_support[i])
+
+    print(msg_id_client, msg_id_support)
+
+    msg_id_client.clear
+    msg_id_support.clear
     client_db = Client_DB()
     client_db.remove(client_id)
 
-# @dp.message_handler(state=Form.chating)
-# async def chat(message: types.Message, state: FSMContext):
-#     print(
-#         'lol'
-#     )
+
