@@ -1,7 +1,10 @@
+include
+Scripts
+*cfg
+bin
+lib64
 *.json
 *.ini
-*.lock
-*.tomp
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
