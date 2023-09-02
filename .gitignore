@@ -1,9 +1,4 @@
 *.json
-include
-Scripts
-*cfg
-bin
-lib64
 *.ini
 
 # Byte-compiled / optimized / DLL files

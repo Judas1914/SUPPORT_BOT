@@ -94,4 +94,3 @@ class Supports_DB:
             "client_id": id
         }
         self.__update()
-
