@@ -87,7 +87,7 @@ class Supports_DB:
 
         Args:
             buzy (bool): True or False
-            id (str): "921040105"
+            id (str): поддержки
         """
         self.__database["telegram_id"] = {
             "buzy": buzy,
