@@ -14,7 +14,7 @@ import asyncio
 import re
 import configparser
 import time
-
+import traceback
 import json
 import os
 
@@ -22,7 +22,34 @@ settings_file = "settings"
 config = configparser.ConfigParser()
 config.read('settings/settings.ini')
 
+API_TOKEN = config['Telegram']['token']
+bot = Bot(token=API_TOKEN)
+
+storage = MemoryStorage()
+dp = Dispatcher(bot, storage=storage)
+
 def config_update():
     with open(settings_file, 'w') as fl:
         config.write(fl)
     config.read(settings_file)
+
+
+
+####
+import logging
+logging.basicConfig(
+    level=logging.INFO,
+    filename="logs.log",
+    format="%(asctime)s - %(module)s\n[%(levelname)s] %(funcName)s:\n %(lineno)d - %(message)s",
+    datefmt='%H:%M:%S',
+    encoding="utf-8"
+
+)
+
+"""
+Места где может произойти ошибка помечай как 
+try:
+    <блок кода>
+except:
+    logging.error(traceback.format_exc())
+"""

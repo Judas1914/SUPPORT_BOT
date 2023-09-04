@@ -2,7 +2,7 @@ from settings import *
 
 class Client_DB:
     def __init__(self):
-        self.__database = self.__load()
+        self.__database: dict = self.__load()
 
     def __load(self):
         if os.path.exists(config["DB"]["client"]): # path.exists- проверят существует ли указанный файл в папке True - если файл есть \ False если он отсутсвует
@@ -22,7 +22,9 @@ class Client_DB:
         """
         with open(config["DB"]["client"], mode = "w", encoding="utf-8") as fl:
             json.dump(self.__database, fl, ensure_ascii=False)
-
+            
+    def get_data(self):
+        return self.__database
 
     def add(self, id: str, message: str):
 

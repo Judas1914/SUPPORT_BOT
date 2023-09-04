@@ -1,14 +1,10 @@
 from settings import *
 from .db import *
+from tools.keybords import *
 
-API_TOKEN = config['Telegram']['token']
-bot = Bot(token=API_TOKEN)
 
-storage = MemoryStorage()
-dp = Dispatcher(bot, storage=storage)
-
-with open(config['DB']['support'], mode = "r", encoding="utf-8") as fl:
-    sup_id_mas = json.load(fl)
+support_data = Client_DB()
+sup_id_mas = support_data.get_data()
 
 sup_id = sup_id_mas["telegram_id"]["client_id"]
 client_id = ""
@@ -17,26 +13,26 @@ msg_id_support = []
 
 @dp.message_handler(commands='start')
 async def start(message: types.Message):
-
-    with open(config['DB']['support'], mode = "r", encoding="utf-8") as fl:
-        sup_id_mas = json.load(fl)
-
+    
+    try:
+        with open(config['DB']['support'], mode = "r", encoding="utf-8") as fl:
+            sup_id_mas = json.load(fl)
+    except:
+        logging.error(traceback.format_exc())
+    
     await bot.send_message(message.chat.id,
                 "⚠️Сразу пишите свойю 👉ПОЧТУ (с которой была покупка)\n"
                 "👉ЛОГИН аккаунта с которым проблема⚠️\n"
                 "И сразу ваш вопрос, если не напишете, то вам и не ответят❗️")
 
     if sup_id_mas["telegram_id"]["buzy"] == "false":
-
-        start_chating = types.InlineKeyboardMarkup()
-        start_sup = types.InlineKeyboardButton(text="Начать сеанс", callback_data="Start." + str(message.chat.id))
-        start_chating.add(start_sup)
+        msg_id = str(message.chat.id)
 
         await bot.send_message(sup_id,
                         "Вам пишет пользователь"
                         "\nName: " + str(message.chat.first_name) +
                         "\nid: " + str(message.chat.id)
-                        ,reply_markup=start_chating)
+                        ,reply_markup=Start_KYB(msg_id))
     else:
         time.sleep(300)
 
@@ -53,7 +49,7 @@ async def start(message: types.Message):
 
 @dp.callback_query_handler(text_contains='Start.')
 async def ans(call):
-    global client_id, msg_id_client, msg_id_support
+    global client_id, msg_id_client, msg_id_support # !
     client_id = (call.data.split('.')[1])
     await bot.send_message(client_id, "Поддержка на связи")
 
