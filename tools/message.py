@@ -27,7 +27,7 @@ async def start(message: types.Message):
 
     if sup_id_mas["telegram_id"]["buzy"] == "false":
         msg_id = str(message.chat.id)
-
+    
         await bot.send_message(sup_id,
                         "Вам пишет пользователь"
                         "\nName: " + str(message.chat.first_name) +
