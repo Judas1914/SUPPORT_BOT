@@ -13,13 +13,13 @@ msg_id_support = []
 
 @dp.message_handler(commands='start')
 async def start(message: types.Message):
-    
+
     try:
         with open(config['DB']['support'], mode = "r", encoding="utf-8") as fl:
             sup_id_mas = json.load(fl)
     except:
         logging.error(traceback.format_exc())
-    
+
     await bot.send_message(message.chat.id,
                 "⚠️Сразу пишите свойю 👉ПОЧТУ (с которой была покупка)\n"
                 "👉ЛОГИН аккаунта с которым проблема⚠️\n"
