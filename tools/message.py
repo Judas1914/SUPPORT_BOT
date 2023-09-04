@@ -27,12 +27,12 @@ async def start(message: types.Message):
 
     if sup_id_mas["telegram_id"]["buzy"] == "false":
         msg_id = str(message.chat.id)
-    
+
         await bot.send_message(sup_id,
                         "Вам пишет пользователь"
                         "\nName: " + str(message.chat.first_name) +
                         "\nid: " + str(message.chat.id)
-                        ,reply_markup=Start_KYB(msg_id))
+                        ,reply_markup=Start_KYB(msg))
     else:
         time.sleep(300)
 
